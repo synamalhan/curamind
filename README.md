@@ -80,7 +80,7 @@ CuraMind is an innovative mental health support chatbot designed to provide acce
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/curamind.git
+   git clone https://github.com/synamalhan/curamind.git
    cd curamind
    ```
 
