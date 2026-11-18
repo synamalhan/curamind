@@ -1,5 +1,7 @@
 # 🧠 CuraMind - AI-Powered Mental Health Support
 
+![Architecture](docs/architecture.svg)
+
 *Empathetic, multilingual mental health chatbot that works offline*
 
 ## 🌟 Project Overview
