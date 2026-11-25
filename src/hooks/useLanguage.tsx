@@ -333,7 +333,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     t
   };
 
-  // ✅ This must return JSX
+  // This must return JSX
   return (
     <LanguageContext.Provider value={contextValue}>
       {children}

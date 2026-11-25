@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- Render at 1600x1000 (2x scale) to regenerate showcase.png. Loads the screenshots next to it. -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root { --paper:#FBF7F0; --ink:#2E2A36; --soft:#6B6577;
+    --lilac:#CBBEFF; --lilac-l:#EEE8FF; --butter:#FFDF85; --butter-l:#FFF4D2;
+    --mint:#A9E0C0; --mint-l:#E2F4E9; --peach:#FFC4A6; --peach-l:#FFEBE0; --sky:#A9CBFF; --sky-l:#E3EFFF; }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1600px; height: 1000px; overflow: hidden; font-family: Nunito, system-ui, sans-serif; color: var(--ink); }
+  .canvas { position: relative; width: 1600px; height: 1000px; overflow: hidden; background: var(--paper); }
+
+  .intro { position: absolute; left: 72px; top: 70px; width: 500px; z-index: 5; }
+  .logo { display: flex; align-items: center; gap: 14px; }
+  .mark { width: 54px; height: 54px; border-radius: 22px 22px 22px 8px; background: var(--lilac);
+    display: grid; place-items: center; transform: rotate(-6deg); }
+  .name { font-size: 38px; font-weight: 900; }
+  h1 { margin-top: 30px; font-size: 46px; line-height: 1.12; font-weight: 900; }
+  .hl { background: linear-gradient(transparent 58%, var(--butter) 58%, var(--butter) 92%, transparent 92%); padding: 0 4px; }
+  .lede { margin-top: 18px; font-size: 18px; line-height: 1.6; color: var(--soft); }
+  .tags { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+  .tag { font-size: 15px; font-weight: 800; padding: 9px 16px; border-radius: 999px; }
+
+  /* A screen sits on a tilted pastel mat */
+  .shot { position: absolute; }
+  .mat { position: absolute; inset: 0; border-radius: 30px; transform: translate(16px, 16px) rotate(-2deg); }
+  .win { position: relative; border-radius: 22px; overflow: hidden; background: #fff; border: 2px solid var(--ink); }
+  .bar { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-bottom: 2px solid var(--ink); background: #fff; }
+  .bar i { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--ink); }
+  .win img { display: block; width: 100%; }
+
+  .note { position: absolute; z-index: 6; font-size: 16px; font-weight: 900; padding: 8px 16px; border-radius: 14px;
+    border: 2px solid var(--ink); background: #fff; }
+
+  .phone { position: absolute; width: 240px; padding: 9px; border-radius: 38px; background: var(--ink); z-index: 4; }
+  .phone img { display: block; width: 100%; border-radius: 30px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <!-- Doodles -->
+  <svg style="position:absolute; left: 470px; top: 610px; z-index: 1" width="150" height="60" viewBox="0 0 150 60" fill="none">
+    <path d="M5 40 C 25 5, 45 55, 65 25 S 105 5, 120 35 S 140 45, 145 20" stroke="#2E2A36" stroke-width="3.5" stroke-linecap="round"/>
+  </svg>
+  <svg style="position:absolute; left: 1505px; top: 885px; z-index: 1" width="80" height="90" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="12" fill="#FFC4A6" stroke="#2E2A36" stroke-width="2.5"/>
+    <g stroke="#2E2A36" stroke-width="3" stroke-linecap="round">
+      <line x1="32" y1="9" x2="32" y2="3"/><line x1="32" y1="55" x2="32" y2="61"/><line x1="9" y1="32" x2="3" y2="32"/><line x1="55" y1="32" x2="61" y2="32"/>
+      <line x1="16" y1="16" x2="12" y2="12"/><line x1="48" y1="48" x2="52" y2="52"/><line x1="48" y1="16" x2="52" y2="12"/><line x1="16" y1="48" x2="12" y2="52"/>
+    </g>
+  </svg>
+
+  <div class="intro">
+    <div class="logo">
+      <div class="mark">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="#FFC4A6" stroke="#2E2A36" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      </div>
+      <div class="name">CuraMind</div>
+    </div>
+    <h1>A gentle place to <span class="hl">talk things through.</span></h1>
+    <p class="lede">Chat by voice or text, see how your mood changes week to week, and take a breather whenever you need one.</p>
+    <div class="tags">
+      <span class="tag" style="background:var(--lilac-l)">Voice or text</span>
+      <span class="tag" style="background:var(--butter-l)">Mood tracking</span>
+      <span class="tag" style="background:var(--mint-l)">Breathing &amp; journal</span>
+      <span class="tag" style="background:var(--peach-l)">Works offline</span>
+      <span class="tag" style="background:var(--sky-l)">English · हिंदी · தமிழ் · Español</span>
+    </div>
+  </div>
+
+  <!-- Dashboard (back) -->
+  <div class="shot" style="left: 680px; top: 60px; width: 780px; z-index: 1;">
+    <div class="mat" style="background: var(--butter)"></div>
+    <div class="win">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div style="height: 420px; overflow: hidden;"><img src="dashboard.png" style="margin-top: -110px;" /></div>
+    </div>
+  </div>
+  <div class="note" style="left: 1330px; top: 34px; background: var(--butter-l); transform: rotate(3deg);">Mood dashboard</div>
+
+  <!-- Toolbox (bottom left) -->
+  <div class="shot" style="left: 72px; top: 600px; width: 520px; z-index: 2;">
+    <div class="mat" style="background: var(--mint)"></div>
+    <div class="win"><div class="bar"><i></i><i></i><i></i></div><img src="toolbox.png" /></div>
+  </div>
+  <div class="note" style="left: 60px; top: 578px; background: var(--mint-l); transform: rotate(-3deg);">Breathing exercise</div>
+
+  <!-- Chat (front) -->
+  <div class="shot" style="left: 600px; top: 420px; width: 720px; z-index: 3;">
+    <div class="mat" style="background: var(--lilac)"></div>
+    <div class="win"><div class="bar"><i></i><i></i><i></i></div><img src="chat.png" /></div>
+  </div>
+  <div class="note" style="left: 1130px; top: 398px; background: var(--lilac-l); transform: rotate(-2deg);">Emotion-aware chat</div>
+
+  <!-- Phone -->
+  <div class="phone" style="left: 1320px; top: 330px;"><img src="mobile.png" /></div>
+  <div class="note" style="left: 1318px; top: 890px; background: var(--peach-l); transform: rotate(2deg);">On your phone</div>
+</div>
+</body>
+</html>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Calendar, TrendingUp, Heart, Smile, Frown, Meh } from 'lucide-react';
 import { emotionService } from '../services/emotionService';
 import { useLanguage } from '../hooks/useLanguage';
+import { emotionColors } from '../emotionColors';
 
 interface EmotionEntry {
   date: string;
@@ -37,24 +38,15 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
     }
   };
 
-  // Prepare data for line chart
-  const chartData = emotionData.reduce((acc, entry) => {
-    const date = entry.date;
-    const existing = acc.find(item => item.date === date);
-    
-    if (existing) {
-      existing[entry.emotion] = (existing[entry.emotion] || 0) + entry.score;
-      existing.count = (existing.count || 0) + 1;
-    } else {
-      acc.push({
-        date,
-        [entry.emotion]: entry.score,
-        count: 1
-      });
-    }
-    
+  // Average mood score per day
+  const dailyScores = emotionData.reduce((acc, entry) => {
+    (acc[entry.date] ||= []).push(entry.score);
     return acc;
-  }, [] as any[]);
+  }, {} as Record<string, number[]>);
+  const chartData = Object.entries(dailyScores).map(([date, scores]) => ({
+    date: new Date(date).toLocaleDateString([], { month: 'short', day: 'numeric' }),
+    score: Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
+  }));
 
   // Prepare data for pie chart
   const emotionCounts = emotionData.reduce((acc, entry) => {
@@ -68,25 +60,14 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
     emotion
   }));
 
-  const emotionColors = {
-    happy: '#F59E0B',
-    sad: '#3B82F6',
-    angry: '#EF4444',
-    anxious: '#8B5CF6',
-    calm: '#10B981',
-    neutral: '#6B7280'
-  };
 
   const getEmotionIcon = (emotion: string) => {
-    const icons = {
-      happy: <Smile className="w-5 h-5 text-yellow-500" />,
-      sad: <Frown className="w-5 h-5 text-blue-500" />,
-      angry: <Frown className="w-5 h-5 text-red-500" />,
-      anxious: <Frown className="w-5 h-5 text-purple-500" />,
-      calm: <Smile className="w-5 h-5 text-green-500" />,
-      neutral: <Meh className="w-5 h-5 text-gray-500" />
-    };
-    return icons[emotion as keyof typeof icons] || <Meh className="w-5 h-5 text-gray-500" />;
+    const Face = emotion === 'happy' || emotion === 'calm' ? Smile : emotion === 'neutral' ? Meh : Frown;
+    return (
+      <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: `${emotionColors[emotion] ?? '#A8A2B3'}33` }}>
+        <Face className="w-5 h-5" style={{ color: emotionColors[emotion] ?? '#A8A2B3' }} strokeWidth={2.25} />
+      </div>
+    );
   };
 
   const averageScore = emotionData.length > 0 
@@ -94,19 +75,21 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
     : 0;
 
   const getMoodDescription = (score: number) => {
-    if (score >= 4) return { text: t('mood_great'), color: 'text-green-600', icon: '😊' };
-    if (score >= 3) return { text: t('mood_good'), color: 'text-blue-600', icon: '🙂' };
-    if (score >= 2) return { text: t('mood_okay'), color: 'text-yellow-600', icon: '😐' };
-    return { text: t('mood_low'), color: 'text-red-600', icon: '😔' };
+    if (score >= 4) return { text: t('mood_great'), color: 'text-mint-deep', Face: Smile };
+    if (score >= 3) return { text: t('mood_good'), color: 'text-sky-deep', Face: Smile };
+    if (score >= 2) return { text: t('mood_okay'), color: 'text-butter-deep', Face: Meh };
+    return { text: t('mood_low'), color: 'text-peach-deep', Face: Frown };
   };
 
-  const currentMood = getMoodDescription(averageScore);
+  const currentMood = emotionData.length > 0
+    ? getMoodDescription(averageScore)
+    : { text: t('no_data_yet'), color: 'text-ink-soft', Face: Meh };
 
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-3 text-gray-600">{t('loading_dashboard')}</span>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ink"></div>
+        <span className="ml-3 text-ink-soft">{t('loading_dashboard')}</span>
       </div>
     );
   }
@@ -116,33 +99,33 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-white" />
+          <div className="w-11 h-11 bg-butter rounded-[18px_18px_18px_6px] -rotate-6 flex items-center justify-center">
+            <TrendingUp className="w-6 h-6 text-ink" strokeWidth={2.25} />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">{t('emotion_dashboard')}</h2>
-            <p className="text-gray-600">{t('dashboard_subtitle')}</p>
+            <h2 className="text-2xl font-extrabold text-ink">{t('emotion_dashboard')}</h2>
+            <p className="text-ink-soft">{t('dashboard_subtitle')}</p>
           </div>
         </div>
         
         {/* Time Range Selector */}
-        <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex bg-paper border border-ink/10 rounded-full p-1">
           <button
             onClick={() => setTimeRange('7d')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-1.5 rounded-full text-sm font-bold transition-colors ${
               timeRange === '7d' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-butter text-ink' 
+                : 'text-ink-soft hover:text-ink'
             }`}
           >
             {t('7_days')}
           </button>
           <button
             onClick={() => setTimeRange('30d')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-1.5 rounded-full text-sm font-bold transition-colors ${
               timeRange === '30d' 
-                ? 'bg-white text-blue-600 shadow-sm' 
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-butter text-ink' 
+                : 'text-ink-soft hover:text-ink'
             }`}
           >
             {t('30_days')}
@@ -151,23 +134,25 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
       </div>
 
       {/* Current Mood Summary */}
-      <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-2xl p-6">
+      <div className="bg-butter-light rounded-[24px] p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="text-4xl">{currentMood.icon}</div>
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center"><currentMood.Face className={`w-9 h-9 ${currentMood.color}`} strokeWidth={2} /></div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">{t('current_mood')}</h3>
-              <p className={`text-2xl font-bold ${currentMood.color}`}>
+              <h3 className="text-sm font-extrabold uppercase tracking-wide text-butter-deep">{t('current_mood')}</h3>
+              <p className="text-3xl font-extrabold text-ink">
                 {currentMood.text}
               </p>
-              <p className="text-sm text-gray-600">
-                {t('average_score')}: {averageScore.toFixed(1)}/5
+              <p className="text-sm text-ink-soft">
+                {emotionData.length > 0
+                  ? `${t('average_score')}: ${averageScore.toFixed(1)}/5`
+                  : t('start_chatting_to_track')}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-gray-800">{emotionData.length}</div>
-            <div className="text-sm text-gray-600">{t('total_entries')}</div>
+            <div className="text-4xl font-extrabold text-ink">{emotionData.length}</div>
+            <div className="text-sm font-semibold text-butter-deep">{t('total_entries')}</div>
           </div>
         </div>
       </div>
@@ -175,36 +160,32 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Emotion Trend Chart */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <Calendar className="w-5 h-5 mr-2 text-blue-500" />
+        <div className="bg-sky-light rounded-[24px] p-6">
+          <h3 className="text-lg font-extrabold text-ink mb-4 flex items-center">
+            <Calendar className="w-5 h-5 mr-2 text-sky-deep" />
             {t('emotion_trends')}
           </h3>
           
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, 5]} />
-                <Tooltip />
-                {Object.keys(emotionColors).map(emotion => (
-                  <Line
-                    key={emotion}
-                    type="monotone"
-                    dataKey={emotion}
-                    stroke={emotionColors[emotion as keyof typeof emotionColors]}
-                    strokeWidth={2}
-                    dot={{ r: 4 }}
-                    connectNulls={false}
-                  />
-                ))}
-              </LineChart>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="moodFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6F9FE6" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#6F9FE6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="#ffffff" strokeWidth={2} vertical={false} />
+                <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v: number) => [`${v}/5`, t('average_score')]} contentStyle={{ borderRadius: 14, border: 'none', fontFamily: 'Nunito', fontWeight: 700 }} />
+                <Area type="monotone" dataKey="score" stroke="#2D5FA8" strokeWidth={3} fill="url(#moodFill)" dot={{ r: 5, fill: '#fff', stroke: '#2D5FA8', strokeWidth: 2.5 }} activeDot={{ r: 6 }} />
+              </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div className="h-64 flex items-center justify-center text-ink-soft">
               <div className="text-center">
-                <Heart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <Heart className="w-12 h-12 mx-auto mb-4 text-ink/20" />
                 <p>{t('no_data_yet')}</p>
                 <p className="text-sm mt-2">{t('start_chatting_to_track')}</p>
               </div>
@@ -213,9 +194,9 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
         </div>
 
         {/* Emotion Distribution */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-green-500" />
+        <div className="bg-lilac-light rounded-[24px] p-6">
+          <h3 className="text-lg font-extrabold text-ink mb-4 flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2 text-lilac-deep" />
             {t('emotion_distribution')}
           </h3>
           
@@ -226,10 +207,12 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
                   data={pieData}
                   cx="50%"
                   cy="50%"
-                  outerRadius={80}
-                  fill="#8884d8"
+                  innerRadius={50}
+                  outerRadius={85}
+                  paddingAngle={3}
+                  // Recharts 2.x can leave an animated labelled Pie blank after async data loads.
+                  isAnimationActive={false}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
                   {pieData.map((entry, index) => (
                     <Cell 
@@ -239,12 +222,13 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend iconType="circle" />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div className="h-64 flex items-center justify-center text-ink-soft">
               <div className="text-center">
-                <TrendingUp className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <TrendingUp className="w-12 h-12 mx-auto mb-4 text-ink/20" />
                 <p>{t('no_data_yet')}</p>
                 <p className="text-sm mt-2">{t('start_chatting_to_track')}</p>
               </div>
@@ -254,32 +238,32 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
       </div>
 
       {/* Recent Emotions */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('recent_emotions')}</h3>
+      <div className="bg-white rounded-[24px] border border-ink/10 p-6">
+        <h3 className="text-lg font-extrabold text-ink mb-4">{t('recent_emotions')}</h3>
         
         {emotionData.length > 0 ? (
           <div className="space-y-3">
-            {emotionData.slice(-10).reverse().map((entry, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            {emotionData.slice(-5).reverse().map((entry, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-paper rounded-2xl">
                 <div className="flex items-center space-x-3">
                   {getEmotionIcon(entry.emotion)}
                   <div>
-                    <span className="font-medium text-gray-800">
+                    <span className="font-bold text-ink">
                       {t(`emotion_${entry.emotion}`)}
                     </span>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-ink-soft">
                       {entry.timestamp.toLocaleDateString()} {entry.timestamp.toLocaleTimeString()}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="text-sm font-medium text-gray-600">
+                  <div className="text-sm font-bold text-ink-soft">
                     {entry.score.toFixed(1)}/5
                   </div>
-                  <div className="w-16 bg-gray-200 rounded-full h-2">
+                  <div className="w-20 bg-ink/10 rounded-full h-2.5">
                     <div
-                      className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full"
-                      style={{ width: `${(entry.score / 5) * 100}%` }}
+                      className="h-2.5 rounded-full"
+                      style={{ width: `${(entry.score / 5) * 100}%`, background: emotionColors[entry.emotion] }}
                     ></div>
                   </div>
                 </div>
@@ -287,8 +271,8 @@ const EmotionDashboard: React.FC<EmotionDashboardProps> = ({ language }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            <Heart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="text-center py-8 text-ink-soft">
+            <Heart className="w-12 h-12 mx-auto mb-4 text-ink/20" />
             <p>{t('no_recent_emotions')}</p>
           </div>
         )}

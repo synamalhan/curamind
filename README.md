@@ -1,14 +1,14 @@
-# 🧠 CuraMind - AI-Powered Mental Health Support
-
-![Architecture](docs/architecture.svg)
+# CuraMind - AI-Powered Mental Health Support
 
 *Empathetic, multilingual mental health chatbot that works offline*
 
-## 🌟 Project Overview
+![CuraMind: chat, mood dashboard, wellness toolbox and mobile view](docs/screenshots/showcase.png)
+
+## Project Overview
 
 CuraMind is an innovative mental health support chatbot designed to provide accessible, empathetic mental health assistance to users worldwide. Built for inclusivity and accessibility, it supports multiple languages and works offline to ensure help is always available.
 
-## 🎯 Problem We Solve
+## Problem We Solve
 
 - **Accessibility**: Mental health support is expensive and not available 24/7
 - **Language Barriers**: Most mental health resources are English-only
@@ -16,36 +16,104 @@ CuraMind is an innovative mental health support chatbot designed to provide acce
 - **Immediate Help**: Crisis situations need instant, empathetic responses
 - **Tracking**: Users need to monitor their emotional wellbeing over time
 
-## ✨ Key Features
+## Key Features
 
-### 🤖 Intelligent Chatbot
+### Intelligent Chatbot
 - **Text & Voice Input**: Communicate through typing or speaking
 - **Emotion Detection**: Real-time emotion analysis from text and voice
 - **Empathetic Responses**: AI-powered responses tailored to user's emotional state
 - **Crisis Detection**: Identifies urgent situations and provides appropriate resources
 
-### 🌍 Multilingual Support
+### Multilingual Support
 - **Local Languages**: Hindi, Tamil, Spanish, and English
 - **Cultural Sensitivity**: Responses adapted to cultural contexts
 - **Easy Switching**: One-click language switching
 
-### 📱 Offline Capability
+### Offline Capability
 - **Local Storage**: Works without internet connection
 - **Sync When Online**: Automatically syncs data when connection restored
 - **Cached Responses**: Pre-loaded supportive responses for common situations
 
-### 📊 Emotion Tracking
+### Emotion Tracking
 - **Daily Mood Tracking**: Visual dashboard showing emotion patterns
 - **Historical Analysis**: 7-day and 30-day emotion trends
 - **Progress Insights**: Identify triggers and improvement patterns
 
-### 🧘 Wellness Toolkit
+### Wellness Toolkit
 - **Breathing Exercises**: Guided breathing sessions
 - **Journaling**: Secure, private digital journaling
 - **Calming Sounds**: Ambient sounds for relaxation
 - **Mindfulness Tips**: Daily wellness suggestions
 
-## 🛠️ Tech Stack
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Browser["Browser — React + TypeScript (Vite)"]
+        direction TB
+        UI["App shell<br/>Navigation · LanguageSelect"]
+        Chat["ChatInterface"]
+        Dash["EmotionDashboard<br/>(Recharts)"]
+        Tools["Toolbox<br/>breathing · journal · sounds"]
+        Voice["useVoice<br/>Web Speech API (STT + TTS)"]
+        Conn["useConnection<br/>online / offline"]
+        ChatSvc["chatService"]
+        EmoSvc["emotionService<br/>+ keyword fallback"]
+        Offline["offlineResponses<br/>4 languages"]
+        IDB[("IndexedDB<br/>CuraMindDB.emotions")]
+
+        UI --> Chat & Dash & Tools
+        Chat --> Voice
+        Chat --> EmoSvc --> ChatSvc
+        Conn -. isOnline .-> ChatSvc & EmoSvc
+        EmoSvc --> IDB
+        Dash --> IDB
+        ChatSvc -- "offline or API error" --> Offline
+    end
+
+    subgraph API["FastAPI backend — backend/main.py"]
+        direction TB
+        EChat["POST /chat"]
+        EEmo["POST /emotion"]
+        EKit["GET /toolkit"]
+        ETrack["POST /track"]
+    end
+
+    subgraph AI["AI models — models/"]
+        direction TB
+        Analyzer["EmotionAnalyzer<br/>Transformers classifier,<br/>rule-based fallback"]
+        LLM["CuraMindLLM<br/>prompts per language,<br/>canned fallback"]
+    end
+
+    Ollama[["Ollama<br/>Mistral · localhost:11434"]]
+
+    EmoSvc -- "text" --> EEmo
+    EmoSvc -- "entry" --> ETrack
+    ChatSvc -- "message, emotion, language" --> EChat
+    ChatSvc --> EKit
+    EEmo --> Analyzer
+    EChat --> Analyzer
+    EChat --> LLM --> Ollama
+
+    classDef fe fill:#eef2ff,stroke:#6366f1,color:#1e1b4b
+    classDef be fill:#f0fdfa,stroke:#14b8a6,color:#134e4a
+    classDef ai fill:#fdf4ff,stroke:#c026d3,color:#4a044e
+    classDef store fill:#fff7ed,stroke:#f97316,color:#431407
+    class UI,Chat,Dash,Tools,Voice,Conn,ChatSvc,EmoSvc,Offline fe
+    class EChat,EEmo,EKit,ETrack be
+    class Analyzer,LLM,Ollama ai
+    class IDB store
+```
+
+**How a message flows**
+
+1. The user types or speaks (Web Speech API turns speech into text).
+2. `emotionService` sends the text to `POST /emotion`; the backend's `EmotionAnalyzer` labels it (happy, sad, angry, anxious, calm, neutral). The result is saved to **IndexedDB**, which powers the dashboard.
+3. `chatService` sends the message + emotion + language to `POST /chat`, where `CuraMindLLM` prompts a local **Ollama** model for an empathetic reply.
+4. **Offline-first:** if the browser is offline or any request fails, emotion detection falls back to keyword matching and replies come from the built-in multilingual `offlineResponses`, so the chat never dead-ends.
+5. Replies to voice messages are read aloud with `speechSynthesis` in the selected language.
+
+## Tech Stack
 
 ### Frontend
 - **React 18** - Modern UI development
@@ -71,7 +139,7 @@ CuraMind is an innovative mental health support chatbot designed to provide acce
 - **Lucide React** - Beautiful, consistent icons
 - **SpeechSynthesis API** - Text-to-speech responses
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+ and npm
@@ -111,7 +179,7 @@ CuraMind is an innovative mental health support chatbot designed to provide acce
    - Backend API: http://localhost:8000
    - API Documentation: http://localhost:8000/docs
 
-## 📖 Usage
+## Usage
 
 1. **Start Chatting**: Type or speak your concerns
 2. **Choose Language**: Select your preferred language from the dropdown
@@ -120,15 +188,27 @@ CuraMind is an innovative mental health support chatbot designed to provide acce
 5. **Use Toolkit**: Access breathing exercises and journaling
 6. **Offline Mode**: Continue using even without internet
 
-## 🎥 Demo
+## Screenshots
 
-![CuraMind Demo](./assets/demo.gif)
-*Demo GIF showing the main chat interface and emotion detection*
+### Chat — emotion-aware conversation
+Each reply is tagged with the emotion detected in your message; the header shows your current mood.
 
-![Dashboard Demo](./assets/dashboard-demo.gif)
-*Demo GIF showing the emotion tracking dashboard*
+![Chat interface](docs/screenshots/chat.png)
 
-## 🏗️ Project Structure
+### Emotion Dashboard — track your mood over time
+Daily mood score, emotion distribution and recent entries, all stored locally in IndexedDB. *(Screenshot uses a week of sample check-ins.)*
+
+![Emotion dashboard](docs/screenshots/dashboard.png)
+
+### Wellness Toolbox — breathing, journaling, calming sounds
+
+![Wellness toolbox](docs/screenshots/toolbox.png)
+
+### Mobile
+
+<img src="docs/screenshots/mobile.png" alt="CuraMind on mobile" width="320" />
+
+## Project Structure
 
 ```
 curamind/
@@ -155,7 +235,7 @@ curamind/
 └── docs/                    # Additional documentation
 ```
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - **Advanced Analytics**: Detailed emotion analysis and insights
 - **Group Support**: Community features and peer support
@@ -164,15 +244,15 @@ curamind/
 - **Gamification**: Wellness challenges and achievement system
 - **Enterprise Version**: Workplace mental health solutions
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Mental health professionals who provided guidance
 - Open-source AI/ML communities
@@ -181,6 +261,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for mental health awareness and accessibility**
+**Built with care for mental health awareness and accessibility**
 
 *If you or someone you know is in crisis, please contact your local emergency services or a mental health crisis hotline immediately.*

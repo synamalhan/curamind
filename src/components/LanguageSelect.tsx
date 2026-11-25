@@ -8,10 +8,10 @@ interface LanguageSelectProps {
 
 const LanguageSelect: React.FC<LanguageSelectProps> = ({ language, onLanguageChange }) => {
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'hi', name: 'हिंदी', flag: '🇮🇳' },
-    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' }
+    { code: 'en', name: 'English' },
+    { code: 'hi', name: 'हिंदी' },
+    { code: 'ta', name: 'தமிழ்' },
+    { code: 'es', name: 'Español' }
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
@@ -21,15 +21,15 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ language, onLanguageCha
       <select
         value={language}
         onChange={(e) => onLanguageChange(e.target.value)}
-        className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="appearance-none bg-white border border-ink/15 rounded-full font-semibold text-sm text-ink px-4 py-2 pr-9 cursor-pointer hover:border-ink/30 focus:outline-none focus:ring-2 focus:ring-lilac"
       >
         {languages.map((lang) => (
           <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.name}
+            {lang.name}
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+      <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-ink-soft pointer-events-none" />
     </div>
   );
 };

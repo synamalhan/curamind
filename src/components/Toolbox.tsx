@@ -1,5 +1,5 @@
 import React, { useState, useEffect , useRef} from 'react';
-import { Waves, BookOpen, Headphones, Flower, Play, Pause, RotateCcw } from 'lucide-react';
+import { Waves, BookOpen, Headphones, Flower, Play, Pause, RotateCcw, CloudRain, Trees, Radio } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
 import rain from "../assets/rain.mp3";
@@ -111,10 +111,10 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
   };
 
   const ambientSounds = [
-    { id: 'rain', name: t('sound_rain'), icon: '🌧️' },
-    { id: 'ocean', name: t('sound_ocean'), icon: '🌊' },
-    { id: 'forest', name: t('sound_forest'), icon: '🌲' },
-    { id: 'white_noise', name: t('sound_white_noise'), icon: '📻' }
+    { id: 'rain', name: t('sound_rain'), Icon: CloudRain, tone: 'bg-sky-light text-sky-deep', on: 'bg-sky' },
+    { id: 'ocean', name: t('sound_ocean'), Icon: Waves, tone: 'bg-lilac-light text-lilac-deep', on: 'bg-lilac' },
+    { id: 'forest', name: t('sound_forest'), Icon: Trees, tone: 'bg-mint-light text-mint-deep', on: 'bg-mint' },
+    { id: 'white_noise', name: t('sound_white_noise'), Icon: Radio, tone: 'bg-peach-light text-peach-deep', on: 'bg-peach' }
   ];
 
   const getBreathingInstruction = () => {
@@ -141,80 +141,79 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-          <Flower className="w-6 h-6 text-white" />
+        <div className="w-11 h-11 bg-mint rounded-[18px_18px_18px_6px] -rotate-6 flex items-center justify-center">
+          <Flower className="w-6 h-6 text-ink" strokeWidth={2.25} />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">{t('wellness_toolbox')}</h2>
-          <p className="text-gray-600">{t('toolbox_subtitle')}</p>
+          <h2 className="text-2xl font-extrabold text-ink">{t('wellness_toolbox')}</h2>
+          <p className="text-ink-soft">{t('toolbox_subtitle')}</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex space-x-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex space-x-1 bg-mint-light rounded-full p-1.5">
         <button
           onClick={() => setActiveTab('breathing')}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-full font-bold transition-colors ${
             activeTab === 'breathing'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
+              ? 'bg-white text-mint-deep'
+              : 'text-ink-soft hover:text-ink'
           }`}
         >
           <Waves className="w-5 h-5" />
-          <span className="font-medium">{t('breathing')}</span>
+          <span>{t('breathing')}</span>
         </button>
         
         <button
           onClick={() => setActiveTab('journal')}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-full font-bold transition-colors ${
             activeTab === 'journal'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
+              ? 'bg-white text-mint-deep'
+              : 'text-ink-soft hover:text-ink'
           }`}
         >
           <BookOpen className="w-5 h-5" />
-          <span className="font-medium">{t('journal')}</span>
+          <span>{t('journal')}</span>
         </button>
         
         <button
           onClick={() => setActiveTab('sounds')}
-          className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg transition-all ${
+          className={`flex-1 flex items-center justify-center space-x-2 py-2.5 px-4 rounded-full font-bold transition-colors ${
             activeTab === 'sounds'
-              ? 'bg-white text-blue-600 shadow-sm'
-              : 'text-gray-600 hover:text-gray-800'
+              ? 'bg-white text-mint-deep'
+              : 'text-ink-soft hover:text-ink'
           }`}
         >
           <Headphones className="w-5 h-5" />
-          <span className="font-medium">{t('sounds')}</span>
+          <span>{t('sounds')}</span>
         </button>
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="pt-2">
         {/* Breathing Exercise */}
         {activeTab === 'breathing' && (
           <div className="text-center space-y-6">
-            <h3 className="text-xl font-semibold text-gray-800">{t('breathing_exercise')}</h3>
-            <p className="text-gray-600">{t('breathing_description')}</p>
+            <h3 className="text-xl font-extrabold text-ink">{t('breathing_exercise')}</h3>
+            <p className="text-ink-soft">{t('breathing_description')}</p>
             
             {/* Breathing Circle */}
-            <div className="relative mx-auto w-64 h-64">
-              <div 
-                className={`absolute inset-0 rounded-full border-4 border-blue-500 transition-all duration-1000 ${
-                  breathingActive ? 'animate-pulse' : ''
-                }`}
+            <div className="relative mx-auto w-72 h-72 flex items-center justify-center">
+              {/* Static guide ring shows the full-breath size */}
+              <div aria-hidden className="absolute inset-0 rounded-full border-2 border-dashed border-mint" />
+              <div
+                className="w-56 h-56 rounded-full ring-8 ring-mint-light ease-in-out"
                 style={{
-                  transform: breathingActive ? 
-                    (breathingPhase === 'inhale' ? 'scale(1.2)' : 
-                     breathingPhase === 'hold' ? 'scale(1.2)' : 'scale(1)') : 'scale(1)'
+                  transform: breathingActive && breathingPhase !== 'exhale' ? 'scale(1.25)' : 'scale(1)',
+                  transition: `transform ${breathingPhase === 'exhale' ? 8 : 4}s ease-in-out`
                 }}
               >
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-mint flex items-center justify-center">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-800 mb-2">
+                    <div className="text-5xl font-extrabold text-ink mb-1 tabular-nums">
                       {breathingActive ? getBreathingDuration() : '4'}
                     </div>
-                    <div className="text-lg font-medium text-gray-600">
+                    <div className="text-base font-bold text-mint-deep">
                       {breathingActive ? getBreathingInstruction() : t('ready_to_breathe')}
                     </div>
                   </div>
@@ -227,7 +226,7 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
               {!breathingActive ? (
                 <button
                   onClick={startBreathing}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-green-600 transition-all"
+                  className="flex items-center space-x-2 bg-ink text-paper font-bold px-6 py-3 rounded-full hover:bg-ink/85 transition-colors"
                 >
                   <Play className="w-5 h-5" />
                   <span>{t('start_breathing')}</span>
@@ -236,7 +235,7 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
                 <div className="flex space-x-3">
                   <button
                     onClick={stopBreathing}
-                    className="flex items-center space-x-2 bg-gray-500 text-white px-6 py-3 rounded-xl hover:bg-gray-600 transition-all"
+                    className="flex items-center space-x-2 bg-white text-ink font-bold border border-ink/15 px-6 py-3 rounded-full hover:bg-paper transition-all"
                   >
                     <Pause className="w-5 h-5" />
                     <span>{t('stop')}</span>
@@ -246,7 +245,7 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
                       stopBreathing();
                       setTimeout(startBreathing, 100);
                     }}
-                    className="flex items-center space-x-2 bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 transition-all"
+                    className="flex items-center space-x-2 bg-mint-light text-mint-deep font-bold px-6 py-3 rounded-full hover:bg-mint transition-all"
                   >
                     <RotateCcw className="w-5 h-5" />
                     <span>{t('restart')}</span>
@@ -261,31 +260,31 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
         {activeTab === 'journal' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('daily_journal')}</h3>
-              <p className="text-gray-600">{t('journal_description')}</p>
+              <h3 className="text-xl font-extrabold text-ink mb-2">{t('daily_journal')}</h3>
+              <p className="text-ink-soft">{t('journal_description')}</p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-ink mb-2">
                   {t('how_are_you_feeling')}
                 </label>
                 <textarea
                   value={journalEntry}
                   onChange={(e) => setJournalEntry(e.target.value)}
                   placeholder={t('journal_placeholder')}
-                  className="w-full h-40 p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full h-44 p-5 bg-butter-light border-0 rounded-[22px] text-ink leading-relaxed placeholder:text-ink-soft/70 focus:outline-none focus:ring-2 focus:ring-butter resize-none"
                 />
               </div>
               
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-ink-soft">
                   {journalEntry.length}/1000 {t('characters')}
                 </div>
                 <button
                   onClick={saveJournal}
                   disabled={!journalEntry.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-6 py-3 rounded-xl hover:from-blue-600 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="bg-ink text-paper font-bold px-6 py-3 rounded-full hover:bg-ink/85 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                 >
                   {t('save_entry')}
                 </button>
@@ -298,8 +297,8 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
         {activeTab === 'sounds' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('ambient_sounds')}</h3>
-              <p className="text-gray-600">{t('sounds_description')}</p>
+              <h3 className="text-xl font-extrabold text-ink mb-2">{t('ambient_sounds')}</h3>
+              <p className="text-ink-soft">{t('sounds_description')}</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -307,16 +306,16 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
                 <button
                   key={sound.id}
                   onClick={() => setAmbientSound(ambientSound === sound.id ? null : sound.id)}
-                  className={`p-6 rounded-xl border-2 transition-all ${
-                    ambientSound === sound.id
-                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                  className={`p-6 rounded-[24px] text-left transition-transform hover:-translate-y-0.5 ${sound.tone} ${
+                    ambientSound === sound.id ? 'ring-2 ring-ink' : ''
                   }`}
                 >
-                  <div className="text-3xl mb-3">{sound.icon}</div>
-                  <div className="font-medium">{sound.name}</div>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${ambientSound === sound.id ? sound.on : 'bg-white'}`}>
+                    <sound.Icon className="w-6 h-6" strokeWidth={2.25} />
+                  </div>
+                  <div className="font-extrabold text-ink">{sound.name}</div>
                   {ambientSound === sound.id && (
-                    <div className="mt-2 text-sm text-blue-600">
+                    <div className="mt-1 text-sm font-bold">
                       {t('playing')}...
                     </div>
                   )}
@@ -325,11 +324,11 @@ const Toolbox: React.FC<ToolboxProps> = ({ language }) => {
             </div>
             
             {ambientSound && (
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <p className="text-blue-700 mb-3">{t('playing_sound')}</p>
+              <div className="bg-paper rounded-[22px] p-4 flex items-center justify-between">
+                <p className="text-ink font-semibold">{t('playing_sound')}</p>
                 <button
                   onClick={() => setAmbientSound(null)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="bg-ink text-paper font-bold px-5 py-2 rounded-full hover:bg-ink/85 transition-colors"
                 >
                   {t('stop_sound')}
                 </button>
